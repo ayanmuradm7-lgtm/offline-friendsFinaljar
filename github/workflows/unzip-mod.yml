@@ -1,1 +1,29 @@
 
+name: Extract Mod Zip
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.zip'
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract all zip files and remove archives
+        run: |
+          find . -name "*.zip" -exec sh -c 'unzip -o "$1" -d "${1%.*}" && rm "$1"' _ {} \;
+
+      - name: Commit and push extracted files
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Extract mod zip files" || exit 0
+          git push
+          
